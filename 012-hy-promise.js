@@ -194,4 +194,24 @@ HYPromise.deferred = function () {
   return dfd
 }
 
+var p3 = new HYPromise(function (resolve, reject) {
+  resolve('B')
+})
+
+var p1 = new HYPromise(function (resolve, reject) {
+  resolve(p3)
+})
+
+var p2 = new HYPromise(function (resolve, reject) {
+  resolve('A')
+})
+
+p1.then(function (v) {
+  console.log('P1', v)
+})
+
+p2.then(function (v) {
+  console.log(v)
+})
+
 module.exports = HYPromise

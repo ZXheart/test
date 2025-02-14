@@ -112,28 +112,49 @@ class ZPromise {
   }
 }
 
-const p = new ZPromise((resolve, reject) => {
-  setTimeout(() => {
-    resolve('ok')
-  }, 1000)
+// const p = new ZPromise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve('ok')
+//   }, 1000)
+// })
+
+// p.then(
+//   data => {
+//     console.log(data)
+//   },
+//   e => {
+//     console.log(e)
+//   }
+// )
+
+// ZPromise.deferred = function () {
+//   const dfd = {}
+//   dfd.promise = new ZPromise((resolve, reject) => {
+//     dfd.resolve = resolve
+//     dfd.reject = reject
+//   })
+//   return dfd
+// }
+
+var p3 = new ZPromise(function (resolve, reject) {
+  resolve('B')
 })
 
-p.then(
-  data => {
-    console.log(data)
-  },
-  e => {
-    console.log(e)
-  }
-)
+var p1 = new ZPromise(function (resolve, reject) {
+  console.log('P1', p3)
+  resolve(p3)
+})
 
-ZPromise.deferred = function () {
-  const dfd = {}
-  dfd.promise = new ZPromise((resolve, reject) => {
-    dfd.resolve = resolve
-    dfd.reject = reject
-  })
-  return dfd
-}
+var p2 = new ZPromise(function (resolve, reject) {
+  resolve('A')
+})
+
+p1.then(function (v) {
+  console.log('P1', v, v.status)
+})
+
+p2.then(function (v) {
+  console.log(v)
+})
 
 module.exports = ZPromise
