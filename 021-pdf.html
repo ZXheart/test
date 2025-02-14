@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <img id="pdf-image" src="" alt="PDF First Page" />
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
+    <script type="module">
+      //   const pdfUrl =
+      //     'https://hq-dms.oss-cn-hangzhou.aliyuncs.com/dms/supplier/11bbeb73-58e1-479e-90fd-48620f48e4cd/data/1733293676447029-利福德-IATF16949-英文 21-8-3.pdf'
+
+      const pdfUrl = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf'
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'
+
+      pdfjsLib
+        .getDocument(pdfUrl)
+        .promise.then(pdf => {
+          // 获取第一页
+          pdf.getPage(1).then(page => {
+            const scale = 1.5
+            const viewport = page.getViewport({ scale })
+
+            // 创建一个 canvas 元素
+            const canvas = document.createElement('canvas')
+            const context = canvas.getContext('2d')
+            canvas.height = viewport.height
+            canvas.width = viewport.width
+
+            // 将 PDF 页面渲染到 canvas 上
+            const renderContext = {
+              canvasContext: context,
+              viewport: viewport,
+            }
+            page.render(renderContext).promise.then(() => {
+              // 将 canvas 转换为图片并设置到 img 标签的 src
+              const img = document.getElementById('pdf-image')
+              img.src = canvas.toDataURL()
+            })
+          })
+        })
+        .catch(error => {
+          console.error('Error loading PDF: ', error)
+        })
+    </script>
+  </body>
+</html>

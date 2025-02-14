@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // const obj = { foo: 2 }
+      // const myObj = Object.create(obj)
+      // myObj.foo = 123
+      // console.log(myObj.foo, obj.foo) // 123 2
+
+      const obj = {}
+      Object.defineProperty(obj, 'foo', {
+        value: 2,
+        writable: false,
+        configurable: true,
+        enumerable: true,
+      })
+      const myObj = Object.create(obj)
+      myObj.foo = 123
+      console.log(myObj, obj) // {} { foo: 2}
+
+      // const obj = {}
+      // Object.defineProperty(obj, 'foo', {
+      //   value: 2,
+      //   writable: false,
+      //   configurable: true,
+      //   enumerable: true,
+      // })
+      // const myObj = Object.create(obj)
+      // Object.defineProperty(myObj, 'foo', {
+      //   value: 123,
+      //   writable: true,
+      //   configurable: true,
+      //   enumerable: true,
+      // })
+      // console.log(myObj, obj) // {foo: 123} { foo: 2}
+
+      // const obj = {
+      //   set foo(value) {
+      //     console.log('set foo:', value)
+      //   },
+      // }
+      // const myObj = Object.create(obj)
+      // myObj.foo = 123 // set foo: 123
+      // console.log(myObj) // {}
+    </script>
+  </body>
+</html>

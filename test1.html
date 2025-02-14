@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      Function.prototype.myBind = function (oThis) {
+        if (typeof this !== 'function') {
+          throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable')
+        }
+        const aArgs = Array.prototype.slice.call(arguments, 1) // 除this外的参数组成的数组
+        const fToBind = this // 被绑定的函数
+        const fNOP = function () {}
+
+        const fBound = function () {
+          return fToBind.apply(
+            this instanceof fNOP && oThis ? this : oThis,
+            aArgs.concat(Array.prototype.slice.call(arguments))
+          )
+        }
+        fNOP.prototype = this.prototype
+        fBound.prototype = new fNOP()
+        return fBound
+      }
+      function foo() {
+        console.log(this.a)
+      }
+      var a = 'global'
+
+      const bar = foo.myBind(null, 3, 4, 5)
+      bar() // global
+      const barRes = new bar() // global
+
+      const baz = foo.bind(null, 3, 4, 5)
+      baz() // global
+      const res = new baz() // undefined
+    </script>
+  </body>
+</html>

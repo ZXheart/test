@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const PENDING = 'pending'
+      const FULFILLED = 'fulfilled'
+      const REJECTED = 'rejected'
+
+      class ZPromise {
+        #status = PENDING
+        #result = null
+        #taskQueue = []
+
+        #isThenable(value) {
+          return (
+            value !== null &&
+            (typeof value === 'object' || typeof value === 'function') &&
+            typeof value.then === 'function'
+          )
+        }
+
+        #changeStatus(status, result) {
+          if (this.#status !== PENDING) return
+          this.#status = status
+          this.#result = result
+
+          this.#runTaskQueue()
+        }
+
+        #runNextTick(cb) {
+          if (typeof process === 'object' && typeof process.nextTick === 'function') {
+            process.nextTick(cb)
+          } else if (typeof queueMicrotask === 'function') {
+            queueMicrotask(cb)
+          } else {
+            setTimeout(cb, 0)
+          }
+        }
+
+        #runTaskOne(callback, resolve, reject) {
+          this.#runNextTick(() => {
+            const settled = this.#status === FULFILLED ? resolve : reject
+
+            // 1. 如果不是函数，promise穿透，传递上一个promise的状态
+            if (typeof callback !== 'function') {
+              settled(this.#result)
+              return
+            }
+
+            // 2. 如果是函数
+            try {
+              const result = callback(this.#result)
+
+              if (this.#isThenable(result)) {
+                // 2.1 执行结果是promise，等待promise状态改变
+
+                // 超强chatgpt告诉我，让我理解这里的一句话：它将`result`的`then`方法的结果传递给当前的`resolve`和`reject`
+                // 这个是简写形式
+                result.then(resolve, reject)
+                // 这个是便于理解的形式
+                // result.then(
+                //   value => {
+                //     resolve(value)
+                //   },
+                //   reason => {
+                //     reject(reason)
+                //   }
+                // )
+              } else {
+                // 2.2 执行结果不是promise，直接resolve
+                resolve(result)
+              }
+            } catch (error) {
+              reject(error)
+            }
+          })
+        }
+
+        #runTaskQueue() {
+          if (this.#status === PENDING) return
+
+          while (this.#taskQueue.length) {
+            const { onFulfilled, onRejected, resolve, reject } = this.#taskQueue.shift()
+
+            if (this.#status === FULFILLED) {
+              this.#runTaskOne(onFulfilled, resolve, reject)
+            }
+
+            if (this.#status === REJECTED) {
+              this.#runTaskOne(onRejected, resolve, reject)
+            }
+          }
+        }
+
+        constructor(executor) {
+          const resolve = value => {
+            this.#changeStatus(FULFILLED, value)
+          }
+          const reject = reason => {
+            this.#changeStatus(REJECTED, reason)
+          }
+          try {
+            executor(resolve, reject)
+          } catch (error) {
+            reject(error)
+          }
+        }
+
+        then(onFulfilled, onRejected) {
+          return new ZPromise((resolve, reject) => {
+            this.#taskQueue.push({
+              onFulfilled,
+              onRejected,
+              resolve,
+              reject,
+            })
+            this.#runTaskQueue()
+          })
+        }
+      }
+
+      const pr = new ZPromise((resolve, reject) => {
+        setTimeout(() => {
+          resolve('success')
+        }, 1000)
+      })
+
+      function resolveThen(res) {
+        console.log(res)
+      }
+
+      pr.then(
+        result => {
+          console.log(result)
+          return Promise.resolve('success2')
+        },
+        error => {
+          console.log(error)
+        }
+      ).then(resolveThen, error => {
+        console.log(error)
+      })
+    </script>
+  </body>
+</html>

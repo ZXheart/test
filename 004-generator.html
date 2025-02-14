@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function* createGenerator(i) {
+        const res1 = yield { name: 'john', age: i }
+        console.log(res1)
+        const res2 = yield { name: 'jane', age: i + 1 }
+        console.log(res2)
+      }
+
+      const gen = createGenerator(20)
+
+      console.log(gen)
+      // ! 生成器函数的next(**)，传入的参数总是上一个yield表达式的返回值，所以第一次next()传入的参数是无意义的
+      console.log(gen.next(3))
+      console.log(gen.next())
+      console.log(gen.next())
+    </script>
+  </body>
+</html>

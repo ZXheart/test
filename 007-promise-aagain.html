@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const PENDING = 'pending'
+      const FULFILLED = 'fulfilled'
+      const REJECTED = 'rejected'
+
+      class ZPromise {
+        #status = PENDING
+        #result = null
+        #taskQueue = []
+
+        #changeStatus(status, result) {
+          if (this.#status !== PENDING) return
+          this.#status = status
+          this.#result = result
+
+          this.#runTaskQueue()
+        }
+
+        constructor(executor) {
+          const resolve = data => {
+            this.#changeStatus(FULFILLED, data)
+          }
+          const reject = reason => {
+            this.#changeStatus(REJECTED, reason)
+          }
+          try {
+            executor(resolve, reject)
+          } catch (error) {
+            reject(error)
+          }
+        }
+
+        #isThenable(value) {
+          return (
+            typeof value !== null &&
+            (typeof value === 'object' || typeof value === 'function') &&
+            typeof value.then === 'function'
+          )
+        }
+
+        #runMicroTask(fn) {
+          if (typeof process === 'object' && typeof process.nextTick === 'function') {
+            process.nextTick(fn)
+            return
+          }
+          if (typeof queueMicrotask === 'function') {
+            queueMicrotask(fn)
+            return
+          }
+          setTimeout(fn, 0)
+        }
+
+        #runTask(thenCallback, resolve, reject) {
+          this.#runMicroTask(() => {
+            const settled = this.#status === FULFILLED ? resolve : reject
+
+            if (typeof thenCallback !== 'function') {
+              return settled(this.#result)
+            }
+
+            try {
+              const result = thenCallback(this.#result)
+              if (this.#isThenable(result)) {
+                // result promise的结果决定当前promise的状态
+                // result.then(data=>{}, reason=>{})
+                // result.then(data=>{resolve(data)}, reason=>{reject(reason)})
+                // fuck 这里好难理解啊！日他哥的！这次稍稍理解了一些，下次估计出还是不懂，TMD!
+                result.then(resolve, reject)
+              } else {
+                resolve(result)
+              }
+            } catch (error) {
+              reject(error)
+            }
+          })
+        }
+
+        #runTaskQueue() {
+          if (this.#status === PENDING) return
+
+          while (this.#taskQueue.length) {
+            const { onFulfilled, onRejected, resolve, reject } = this.#taskQueue.shift()
+            if (this.#status === FULFILLED) {
+              this.#runTask(onFulfilled, resolve, reject)
+            }
+            if (this.#status === REJECTED) {
+              this.#runTask(onRejected, resolve, reject)
+            }
+          }
+        }
+
+        then(onFulfilled, onRejected) {
+          return new ZPromise((resolve, reject) => {
+            this.#taskQueue.push({
+              onFulfilled,
+              onRejected,
+              resolve,
+              reject,
+            })
+            this.#runTaskQueue()
+          })
+        }
+      }
+
+      const pr = new ZPromise((resolve, reject) => {
+        // setTimeout(() => {
+        reject('no')
+        resolve('ok')
+        // }, 1000)
+      })
+
+      pr.then(
+        data => {
+          console.log(data)
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve('ok2')
+            }, 1000)
+          })
+        },
+        reason => {
+          console.log(reason)
+          return Promise.resolve('no2')
+        }
+      ).then(
+        data => {
+          console.log('data2:', data)
+        },
+        reason => {
+          console.log(reason)
+        }
+      )
+    </script>
+  </body>
+</html>
