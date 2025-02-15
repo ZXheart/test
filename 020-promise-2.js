@@ -16,6 +16,10 @@ class ZPromise {
 
   constructor(executor) {
     const resolve = data => {
+      if (data instanceof ZPromise || (data && typeof data.then === 'function')) {
+        data.then(resolve, reject)
+        return
+      }
       this.#changeStatus(FULFILLED, data)
     }
     const reject = reason => {
@@ -136,21 +140,25 @@ class ZPromise {
 //   return dfd
 // }
 
-var p3 = new ZPromise(function (resolve, reject) {
-  resolve('B')
-})
+// var p3 = new Promise(function (resolve, reject) {
+//   resolve('B')
+// })
+const p3 = {
+  then(rs, rj) {
+    rs('thenable')
+  },
+}
 
-var p1 = new ZPromise(function (resolve, reject) {
-  console.log('P1', p3)
+var p1 = new Promise(function (resolve, reject) {
   resolve(p3)
 })
 
-var p2 = new ZPromise(function (resolve, reject) {
+var p2 = new Promise(function (resolve, reject) {
   resolve('A')
 })
 
 p1.then(function (v) {
-  console.log('P1', v, v.status)
+  console.log('P1', v)
 })
 
 p2.then(function (v) {
