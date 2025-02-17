@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <a href="#" class="a-el">1</a>
+      <a href="#" class="a-el">2</a>
+    </div>
+
+    <script>
+      const nodeListEls = document.querySelectorAll('.a-el')
+      const collectionEls = document.getElementsByClassName('a-el')
+      console.log('Initial static NodeList', nodeListEls) // NodeList(2) [a.a-el, a.a-el]
+      console.log('Initial Live HTMLCollection', collectionEls) // HTMLCollection(2) [a.a-el, a.a-el]
+
+      const newAEl = document.createElement('a')
+      newAEl.textContent = '3'
+      newAEl.href = '#'
+      newAEl.className = 'a-el'
+      document.querySelector('.container').appendChild(newAEl)
+
+      console.log('Updated static NodeList', nodeListEls) // NodeList(2) [a.a-el, a.a-el]
+      console.log('Updated Live HTMLCollection', collectionEls) // HTMLCollection(3) [a.a-el, a.a-el, a.a-el]
+
+      const p = new Promise((resolve, reject) => {
+        reject('error')
+      })
+
+      p.then(res => {
+        console.log(res)
+      }).then(
+        () => {},
+        err => {
+          console.log(err)
+        }
+      )
+    </script>
+  </body>
+</html>

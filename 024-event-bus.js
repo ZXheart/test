@@ -48,3 +48,11 @@ evt.on('completion', res => {
 evt.on('error', e => {
   console.log('error :', e)
 })
+
+function createRejectedPromise() {
+  return new Promise((resolve, reject) => {
+    reject(new Error('Something went wrong'))
+  })
+}
+
+createRejectedPromise()
