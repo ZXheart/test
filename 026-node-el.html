@@ -9,6 +9,9 @@
     <div class="container">
       <a href="#" class="a-el">1</a>
       <a href="#" class="a-el">2</a>
+
+      <button id="btn">delay</button>
+      <span class="span">span</span>
     </div>
 
     <script>
@@ -38,6 +41,16 @@
           console.log(err)
         }
       )
+
+      function delay(ms) {
+        const start = Date.now()
+        while (Date.now() - start < ms) {}
+      }
+      const btnEl = document.getElementById('btn')
+      btnEl.addEventListener('click', () => {
+        document.querySelector('.span').textContent = 'clicked'
+        delay(3000)
+      })
     </script>
   </body>
 </html>

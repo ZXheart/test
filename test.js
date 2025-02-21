@@ -44,3 +44,62 @@ console.log(pr1 === pr2) // false
 const pr3 = Promise.resolve(2)
 const pr4 = Promise.resolve(pr3)
 console.log(pr3 === pr4) // true
+
+// --------------------------------------------
+
+let nextVal
+const it = {
+  [Symbol.iterator]() {
+    return this
+  },
+  next() {
+    if (nextVal === undefined) {
+      nextVal = 1
+    } else {
+      nextVal = 3 * nextVal + 6
+    }
+    return { done: false, value: nextVal }
+  },
+}
+
+for (const v of it) {
+  console.log(v)
+  if (v > 500) {
+    break
+  }
+}
+
+// --------------------------------------------
+
+function* something() {
+  try {
+    var nextVal
+
+    while (true) {
+      if (nextVal === undefined) {
+        nextVal = 1
+      } else {
+        nextVal = 3 * nextVal + 6
+      }
+      yield nextVal
+    }
+  } finally {
+    // 清理子句
+    console.log('cleaning up!')
+  }
+}
+
+var it1 = something()
+
+for (var v of it1) {
+  console.log('something:', v)
+
+  // 不要死循环！
+  if (v > 500) {
+    console.log(
+      // 完成生成器的迭代器
+      it1.return('hello world')
+    )
+    // 这里不需要 break
+  }
+}

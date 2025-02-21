@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="start">start</button>
+    <button id="addInteraction">add</button>
+
+    <script>
+      // 死循环n ms
+      function delay(ms) {
+        const start = Date.now()
+        while (Date.now() - start < ms) {}
+      }
+
+      function addDelay() {
+        console.log('添加延时队列')
+        setTimeout(() => {
+          console.log('延时队列执行')
+        }, 0)
+        delay(2000)
+      }
+
+      function addInteraction() {
+        console.log('添加交互')
+        document.getElementById('addInteraction').addEventListener('click', () => {
+          console.log('交互执行')
+        })
+        // delay(2000)
+      }
+
+      document.getElementById('start').addEventListener('click', () => {
+        addDelay()
+        addInteraction()
+        console.log('sync done')
+
+        document.getElementById('addInteraction').click()
+      })
+
+      const p1 = Promise.reject(1)
+      //   const p2 = Promise.resolve(2)
+
+      //   const res = Promise.any([p1, p2])
+      //   res.then(
+      //     res => {
+      //       console.log(res)
+      //     },
+      //     err => {
+      //       console.log('reason:', err)
+      //     }
+      //   )
+
+      p1.then(
+        res => {
+          console.log(res)
+        }
+        // err => {
+        //   console.log('reason:', err)
+        // }
+      )
+      //   .catch(err => {
+      //     console.log('catch:', err)
+      //   })
+    </script>
+  </body>
+</html>
