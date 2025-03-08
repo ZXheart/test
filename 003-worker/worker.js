@@ -1,4 +1,5 @@
 self.onmessage = e => {
+  console.log(e)
   const number = e.data // 获取主线程发送的数据
   // const res = fibonacci(number) // 计算斐波那契数列
   const res = number * 2

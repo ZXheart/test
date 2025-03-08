@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="start">点击</button>
+    <button id="addInteraction">添加交互</button>
+
+    <script>
+      function addDelay() {
+        console.log('添加延时队列')
+        setTimeout(() => {
+          console.log('延时队列执行')
+        }, 0)
+      }
+
+      function addInteraction() {
+        console.log('添加交互')
+        document.getElementById('addInteraction').addEventListener('click', () => {
+          console.log('交互执行')
+        })
+      }
+
+      document.getElementById('start').addEventListener('click', () => {
+        addDelay()
+        addInteraction()
+        document.getElementById('addInteraction').click()
+      })
+    </script>
+  </body>
+</html>

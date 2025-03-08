@@ -4,15 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      .pdf-container {
+        /* width: 200px;
+        height: 200px;
+        overflow: hidden; */
+      }
+      #pdf-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+      }
+    </style>
   </head>
   <body>
-    <img id="pdf-image" src="" alt="PDF First Page" />
+    <div class="pdf-container">
+      <img id="pdf-image" src="" alt="PDF First Page" />
+    </div>
     <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
     <script type="module">
-      //   const pdfUrl =
-      //     'https://hq-dms.oss-cn-hangzhou.aliyuncs.com/dms/supplier/11bbeb73-58e1-479e-90fd-48620f48e4cd/data/1733293676447029-利福德-IATF16949-英文 21-8-3.pdf'
+      const pdfUrl =
+        'https://hq-dms.oss-cn-hangzhou.aliyuncs.com/dms/supplier/11bbeb73-58e1-479e-90fd-48620f48e4cd/data/1733293676447029-利福德-IATF16949-英文 21-8-3.pdf'
 
-      const pdfUrl = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf'
+      // const pdfUrl = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf'
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'
 
       pdfjsLib
@@ -20,7 +34,7 @@
         .promise.then(pdf => {
           // 获取第一页
           pdf.getPage(1).then(page => {
-            const scale = 1.5
+            const scale = 1
             const viewport = page.getViewport({ scale })
 
             // 创建一个 canvas 元素

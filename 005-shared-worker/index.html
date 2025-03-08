@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="start">start</button>
+    <a href="./about.html" id="to-about">to about</a>
+    <script>
+      document.getElementById('start').addEventListener('click', () => {
+        const sharedWorker = new SharedWorker('./shared-worker.js')
+        sharedWorker.port.start()
+        sharedWorker.port.postMessage('Hello from index')
+        // sharedWorker.port.addEventListener('message', e => {
+        //   console.log('Message from shared worker:', e.data)
+        // })
+
+        sharedWorker.port.onmessage = function (e) {
+          console.log('Message from shared worker:', e.data)
+        }
+      })
+    </script>
+  </body>
+</html>
